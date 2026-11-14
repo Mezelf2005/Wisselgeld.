@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Wisselgeld">
+    <title>Wisselgeld Calculator</title>
+    
+    <!-- App-icoontje voor iPhone beginscherm (ingebouwde SVG) -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://w3.org' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23007AFF'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='white' font-family='Arial, sans-serif' font-weight='bold'>€</text></svg>">
+
+    <style>
+        :root {
+            --bg-color: #F2F2F7;
+            --card-bg: #FFFFFF;
+            --primary: #007AFF;
+            --primary-dark: #0056B3;
+            --text-main: #1C1C1E;
+            --text-sub: #8E8E93;
+            --danger: #FF3B30;
+            --success: #34C759;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .currency-symbol {
+            position: absolute;
+            left: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-sub);
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 14px 14px 34px;
+            font-size: 18px;
+            font-weight: 600;
+            border: 1.5px solid #E5E5EA;
+            border-radius: 12px;
+            background-color: #F9F9FB;
+            color: var(--text-main);
+            box-sizing: border-box;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #FFFFFF;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-calc {
+            background-color: var(--primary);
+            color: white;
+            flex: 2;
+        }
+
+        .btn-reset {
+            background-color: #E5E5EA;
+            color: var(--text-main);
+            flex: 1;
+        }
+
+        #resultaat {
+            display: none;
+        }
+
+        .totaal-terug {
+            text-align: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #E5E5EA;
+            margin-bottom: 16px;
+        }
+
+        .totaal-label {
+            font-size: 14px;
+            color: var(--text-sub);
+            margin-bottom: 4px;
+        }
+
+        .totaal-bedrag {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--success);
+        }
+
+        .geld-lijst {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .geld-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #F2F2F7;
+            font-size: 16px;
+        }
+
+        .geld-item:last-child {
+            border-bottom: none;
+        }
+
+        .badge {
+            background-color: #E5F1FF;
+            color: var(--primary);
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .melding-fout {
+            color: var(--danger);
+            text-align: center;
+            font-weight: 600;
+            padding: 10px;
+        }
+
+        .melding-gepast {
+            color: var(--primary);
+            text-align: center;
+            font-weight: 600;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <div class="header-icon">€</div>
+        <h1>Wisselgeld</h1>
+    </div>
+
+    <div class="card">
+        <div class="input-group">
+            <label for="gegeven">Gegeven bedrag</label>
+            <div class="input-wrapper">
+                <span class="currency-symbol">€</span>
+                <input type="text" inputmode="decimal" id="gegeven" placeholder="0,00">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="totaal">Totaalbedrag</label>
+            <div class="input-wrapper">
+                <span class="currency-symbol">€</span>
+                <input type="text" inputmode="decimal" id="totaal" placeholder="0,00">
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-reset" onclick="wissen()">Wis</button>
+            <button class="btn-calc" onclick="bereken()">Bereken</button>
+        </div>
+    </div>
+
+    <div class="card" id="resultaat"></div>
+</div>
+
+<script>
+function bereken() {
+    let gegevenTekst = document.getElementById("gegeven").value.replace(",", ".");
+    let totaalTekst = document.getElementById("totaal").value.replace(",", ".");
+    
+    let x = parseFloat(gegevenTekst);
+    let y = parseFloat(totaalTekst);
+    let res = document.getElementById("resultaat");
+    res.style.display = "block";
+
+    if (isNaN(x) || isNaN(y) || x < 0 || y < 0) {
+        res.innerHTML = "<div class='melding-fout'>Vul twee geldige, positieve bedragen in.</div>";
+        return;
+    }
+
+    if (x < y) {
+        let tekort = (y - x).toFixed(2).replace(".", ",");
+        res.innerHTML = `<div class='melding-fout'>Te weinig betaald! Nog € ${tekort} tekort.</div>`;
+        return;
+    }
+
+    if (x === y) {
+        res.innerHTML = "<div class='melding-gepast'>Gepast betaald! Geen wisselgeld nodig.</div>";
+        return;
+    }
+
+    let z = Math.round((x - y) * 100);
+    let terugTekst = (z / 100).toFixed(2).replace(".", ",");
+
+    let html = `
+        <div class="totaal-terug">
+            <div class="totaal-label">Terug te geven</div>
+            <div class="totaal-bedrag">€ ${terugTekst}</div>
+        </div>
+        <ul class="geld-lijst">
+    `;
+
+    const eenheden = [
+        [50000, "Briefje van € 500", "Briefjes van € 500"],
+        [20000, "Briefje van € 200", "Briefjes van € 200"],
+        [10000, "Briefje van € 100", "Briefjes van € 100"],
+        [5000, "Briefje van € 50", "Briefjes van € 50"],
+        [2000, "Briefje van € 20", "Briefjes van € 20"],
+        [1000, "Briefje van € 10", "Briefjes van € 10"],
+        [500, "Briefje van € 5", "Briefjes van € 5"],
+        [200, "Muntstuk van € 2", "Muntstukken van € 2"],
+        [100, "Muntstuk van € 1", "Muntstukken van € 1"],
+        [50, "Muntstuk van 50 cent", "Muntstukken van 50 cent"],
+        [20, "Muntstuk van 20 cent", "Muntstukken van 20 cent"],
+        [10, "Muntstuk van 10 cent", "Muntstukken van 10 cent"],
+        [5, "Muntstuk van 5 cent", "Muntstukken van 5 cent"],
+        [2, "Muntstuk van 2 cent", "Muntstukken van 2 cent"],
+        [1, "Muntstuk van 1 cent", "Muntstukken van 1 cent"]
+    ];
+
+    for (let [waarde, enkelvoud, meervoud] of eenheden) {
+        let aantal = Math.floor(z / waarde);
+        z = z % waarde;
+
+        if (aantal === 1) {
+            html += `<li class="geld-item"><span>${enkelvoud}</span><span class="badge">1x</span></li>`;
+        } else if (aantal > 1) {
+            html += `<li class="geld-item"><span>${meervoud}</span><span class="badge">${aantal}x</span></li>`;
+        }
+    }
+
+    html += "</ul>";
+    res.innerHTML = html;
+}
+
+function wissen() {
+    document.getElementById("gegeven").value = "";
+    document.getElementById("totaal").value = "";
+    document.getElementById("resultaat").style.display = "none";
+}
+</script>
+
+</body>
+</html>
